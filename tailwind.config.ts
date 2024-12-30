@@ -8,6 +8,9 @@ export default {
   ],
   theme: {
     extend: {
+      transform: {
+        
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",

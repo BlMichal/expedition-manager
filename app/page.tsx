@@ -1,101 +1,134 @@
-import Image from "next/image";
+'use client'
+
+import { useState, useEffect } from "react";
+import { dummydata } from "./dummydata";
+import { DummyDataTypes } from "../utils/types";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const [data, setData] = useState<DummyDataTypes[]>([]);
+
+
+  useEffect(() => {
+    const storedData = localStorage.getItem("dummydata");
+    if (storedData) {
+      setData(JSON.parse(storedData) as DummyDataTypes[]);
+    } else {
+      localStorage.setItem("dummydata", JSON.stringify(dummydata));
+      setData(dummydata);
+    }
+  }, []);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const name = (form.elements.namedItem("name") as HTMLInputElement).value;
+    const stackable = (form.elements.namedItem("stackable") as HTMLInputElement).checked;
+    const length = +(form.elements.namedItem("length") as HTMLInputElement).value;
+    const weight = +(form.elements.namedItem("weight") as HTMLInputElement).value;
+    const width = +(form.elements.namedItem("width") as HTMLInputElement).value;
+    const height = +(form.elements.namedItem("height") as HTMLInputElement).value;
+
+    const newItem: DummyDataTypes = { name, stackable, length, weight, width, height };
+
+    console.log(typeof (newItem))
+
+    if (name && length && weight && width && height) {
+      const updatedData = [...data, newItem];
+      setData(updatedData);
+      localStorage.setItem("dummydata", JSON.stringify(updatedData));
+      form.reset();
+    }
+  };
+
+
+  const blocksToColorize = Math.min(data.length, 34);
+
+
+
+  return (
+    <>
+      <div className="flex justify-center items-center p-10">
+        <div className="grid grid-rows-2 grid-flow-col gap-2 mb-4 w-fit border-dotted border p-2">
+          {Array.from({ length: 34 }, (_, index) => (
+            <div
+              key={index}
+              className={`w-12 h-12 border rounded ${index < blocksToColorize ? "bg-blue-500" : "bg-gray-200"
+                }`}
+            >{index + 1}</div>
+          ))}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+      </div>
+
+
+      <div className="p-10">
+        {data.map((item) => (
+          <div key={item.name} className="flex gap-1">
+            <h1>{item.name}</h1>
+            <p>Length: {item.length}</p>
+            <p>Width: {item.width}</p>
+            <p>Height: {item.height}</p>
+            <p>Weight: {item.weight}</p>
+          </div>
+        ))}
+      </div>
+      <form onSubmit={handleSubmit} className="mb-6 flex flex-col gap-4 bg-gray-400 p-4 ml-10 rounded max-w-96">
+        <input
+          type="text"
+          name="name"
+          placeholder="Name"
+          className="p-2 border rounded"
+        />
+        <label className="flex items-center gap-2 text-black">
+          <input type="checkbox" name="stackable" />
+          Stackable
+        </label>
+        <label className="flex items-center gap-2 text-black">Délka
+          <input
+            type="number"
+            name="length"
+            placeholder="Length"
+            className="p-2 border rounded"
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+        </label>
+        <div className="relative z-0 w-full group">
+          <input
+            type="text"
+            name="title"
+            id="title"
+            className="block py-2.5 w-full text-sm text-black bg-transparent bg-white border-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-orange-500 focus:outline-none focus:ring-0 focus:border-orange-600 peer"
+            placeholder=" "
+            required
           />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+          <label
+            htmlFor="title"
+            className="ml-2 px-1 peer-focus:font-medium absolute text-sm text-black rounded-lg bg-white peer-focus:bg-orange-600 dark:text-gray-400 duration-300 transform -translate-y-5 scale-85 top-2 z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-black peer-focus:dark:text-orange-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-85 peer-focus:-translate-y-5"
+          >
+            Název
+          </label>
+        </div>
+        <input
+          type="number"
+          name="width"
+          placeholder="Width"
+          className="p-2 border rounded"
+        />
+        <input
+          type="number"
+          name="height"
+          placeholder="Height"
+          className="p-2 border rounded"
+        />
+        <input
+          type="number"
+          name="weight"
+          placeholder="Weight"
+          className="p-2 border rounded"
+        />
+        <button type="submit" className="p-2 bg-blue-500 text-white rounded">
+          Add
+        </button>
+      </form>
+    </>
   );
 }
