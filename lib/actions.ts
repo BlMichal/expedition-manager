@@ -1,5 +1,8 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function createCargo(prevState: any, formData: FormData) {
   const rawData = {
     items: [
@@ -15,7 +18,7 @@ export async function createCargo(prevState: any, formData: FormData) {
     ],
   };
 
-  try {
+ 
     const res = await fetch("http://localhost:8080/api/v1/cargo", {
       method: "POST",
       headers: {
@@ -24,7 +27,9 @@ export async function createCargo(prevState: any, formData: FormData) {
       body: JSON.stringify(rawData), 
     });    
     
-  } catch (error) {
-    return { success: false, message: (error as Error).message };
-  }
+    if(!res.ok)
+      return {message: "Chyba při odesílání požadavku."};
+  
+    revalidatePath('/')
+  
 }

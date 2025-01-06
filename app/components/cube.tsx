@@ -1,7 +1,7 @@
 'use client'
 
 
-const Cube = ({ rotateX, rotateY }) => {
+const Cube = ({ rotateX, rotateY }:{rotateX:number, rotateY:number}) => {
     return (
         <div
             className="w-[60px] h-[60px] relative"
